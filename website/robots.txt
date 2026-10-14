@@ -1,0 +1,69 @@
+# =========================================================
+# NALIDE Cert Manager robots.txt
+# 站点结构：index.html / privacy.html / terms.html
+# 多语言模型：单 URL + JS 切换（?lang= 仅用户体验状态）
+#   - canonical / sitemap 均指向裸 URL
+#   - 参数 URL 不进入索引，避免重复内容
+# =========================================================
+
+# =========================================================
+# 恶意机器人声明：本站不欢迎恶意爬虫、漏洞扫描器、
+# 内容窃取工具。以下行为将被视为恶意并可能被封禁：
+#   - 批量抓取 .env / 配置文件
+#   - WordPress / phpMyAdmin 爆破探测
+#   - 高频无意义请求（DDoS 前兆）
+# 合法 AI 爬虫（GPTBot/ClaudeBot/PerplexityBot 等）不受影响。
+# =========================================================
+
+# 已知恶意/滥用爬虫：明确禁止
+User-agent: Scrapy
+Disallow: /
+
+User-agent: curl
+Disallow: /.env
+Disallow: /*.env
+
+User-agent: wget
+Disallow: /.env
+Disallow: /*.env
+
+User-agent: python-requests
+Disallow: /
+
+User-agent: Go-http-client
+Disallow: /
+
+# 漏洞扫描器
+User-agent: Nikto
+Disallow: /
+
+User-agent: sqlmap
+Disallow: /
+
+User-agent: Nmap
+Disallow: /
+
+User-agent: *
+Allow: /
+
+# 屏蔽语言参数 URL（避免与裸 URL 形成重复内容）
+Disallow: /*?lang=
+
+# AI 爬虫：允许访问，用于 llms.txt 增强理解
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# 站点地图
+Sitemap: https://cert.nalide.com/sitemap.xml
