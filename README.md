@@ -122,6 +122,10 @@ go build -o nalide-cert-manager ./cmd/server
 
 欢迎提交 Issue 和 Pull Request。
 
+## 界面自定义
+
+Web 面板的界面可自由修改替换。前端为独立模块，你可以根据自己的品牌风格重写页面样式、调整布局、替换 Logo，改完重新构建即可生效，无需改动后端逻辑。
+
 ## 开源协议
 
 本项目采用 [Apache-2.0](LICENSE) 协议开源。
