@@ -47,11 +47,17 @@ require_cmd() {
 
 # ---------- 下载 ----------
 download_binary() {
-  local os="$1" arch="$2" url=""
+  local os="$1" arch="$2" url="" asset=""
+  # V1.0 附件名（含 iOS 上传前缀）
+  case "${os}-${arch}" in
+    linux-amd64) asset="prod_1a13ce8e338_76a6ae6bbc1d_nalide-cert-manager-linux-amd64" ;;
+    linux-arm64) asset="prod_1a13ce8e33c_b65cff8e1c92_nalide-cert-manager-linux-arm64" ;;
+    *) error "不支持的平台: ${os}/${arch}"; exit 1 ;;
+  esac
   if [ "$VERSION" = "latest" ]; then
-    url="https://github.com/${REPO}/releases/latest/download/${BIN_NAME}-${os}-${arch}"
+    url="https://github.com/${REPO}/releases/latest/download/${asset}"
   else
-    url="https://github.com/${REPO}/releases/download/${VERSION}/${BIN_NAME}-${os}-${arch}"
+    url="https://github.com/${REPO}/releases/download/${VERSION}/${asset}"
   fi
   info "下载: ${url}"
   require_cmd curl
@@ -60,14 +66,15 @@ download_binary() {
 
 # ---------- 安装 ----------
 install_binary() {
+  local src="$1"
   if [ ! -w "${INSTALL_DIR}" ]; then
     warn "目标目录 ${INSTALL_DIR} 不可写，改用 sudo 安装"
     require_cmd sudo
-    sudo install -m 0755 "${BIN_NAME}" "${INSTALL_DIR}/${BIN_NAME}"
-    sudo rm -f "${BIN_NAME}"
+    sudo install -m 0755 "${src}" "${INSTALL_DIR}/${BIN_NAME}"
+    rm -f "${src}"
   else
-    install -m 0755 "${BIN_NAME}" "${INSTALL_DIR}/${BIN_NAME}"
-    rm -f "${BIN_NAME}"
+    install -m 0755 "${src}" "${INSTALL_DIR}/${BIN_NAME}"
+    rm -f "${src}"
   fi
 }
 
@@ -86,8 +93,13 @@ main() {
   cd "${tmpdir}"
   trap 'rm -rf "${tmpdir}"' EXIT
 
+  local asset=""
+  case "${os}-${arch}" in
+    linux-amd64) asset="prod_1a13ce8e338_76a6ae6bbc1d_nalide-cert-manager-linux-amd64" ;;
+    linux-arm64) asset="prod_1a13ce8e33c_b65cff8e1c92_nalide-cert-manager-linux-arm64" ;;
+  esac
   download_binary "${os}" "${arch}"
-  install_binary
+  install_binary "${asset}"
 
   info "安装完成: ${INSTALL_DIR}/${BIN_NAME}"
   echo ""
