@@ -1,3 +1,5 @@
+![Nalide](assets/brand-banner.jpg)
+
 <div align="center">
 
 # NALIDE Cert Manager
