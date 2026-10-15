@@ -2,7 +2,9 @@
 # ============================================================
 # NALIDE Cert Manager - 一键安装脚本
 # 仓库: https://github.com/fengderenzhui-lab/nalide-cert-manager
-# 用法: curl -sSO https://raw.githubusercontent.com/fengderenzhui-lab/nalide-cert-manager/main/install.sh && bash install.sh
+# 用法:
+#   安装: curl -fsSL https://raw.githubusercontent.com/fengderenzhui-lab/nalide-cert-manager/main/install.sh | bash
+#   卸载: curl -fsSL https://raw.githubusercontent.com/fengderenzhui-lab/nalide-cert-manager/main/install.sh | bash -s -- --uninstall
 # ============================================================
 set -euo pipefail
 
@@ -56,7 +58,7 @@ find_asset_url() {
   fi
   require_cmd curl
   # 找名字以 nalide-cert-manager-<os>-<arch> 结尾的附件
-  curl -fsSL "$api_url" | grep -o ""browser_download_url": *"[^"]*nalide-cert-manager-${os}-${arch}[^"]*"" | head -1 | cut -d'"' -f4
+  curl -fsSL "$api_url" | grep -o '"browser_download_url": *"[^"]*"' | grep "nalide-cert-manager-${os}-${arch}" | head -1 | cut -d'"' -f4
 }
 
 download_binary() {
@@ -100,7 +102,27 @@ show_banner() {
   echo ""
 }
 
+do_uninstall() {
+  show_banner
+  local target="${INSTALL_DIR}/${BIN_NAME}"
+  if [ -f "$target" ]; then
+    if [ ! -w "${INSTALL_DIR}" ]; then
+      require_cmd sudo
+      sudo rm -f "$target"
+    else
+      rm -f "$target"
+    fi
+    info "已卸载: $target"
+  else
+    warn "未找到已安装的 ${BIN_NAME}"
+  fi
+  exit 0
+}
+
 main() {
+  if [ "${1:-}" = "--uninstall" ]; then
+    do_uninstall
+  fi
   show_banner
   info "开始安装..."
   info "仓库: https://github.com/${REPO}"
