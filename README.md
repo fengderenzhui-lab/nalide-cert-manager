@@ -37,7 +37,7 @@
 ### 一键安装（推荐）
 
 ```bash
-curl -sSO https://raw.githubusercontent.com/fengderenzhui-lab/nalide-cert-manager/main/install.sh && bash install.sh
+curl -fsSL https://raw.githubusercontent.com/fengderenzhui-lab/nalide-cert-manager/main/install.sh | bash
 ```
 
 安装脚本会自动检测系统架构（amd64 / arm64），下载对应二进制文件，安装并启动 systemd 服务，最后打印面板地址、用户名和随机初始密码。
