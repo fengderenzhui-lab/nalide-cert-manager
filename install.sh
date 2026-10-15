@@ -46,18 +46,25 @@ require_cmd() {
 }
 
 # ---------- 下载 ----------
-download_binary() {
-  local os="$1" arch="$2" url="" asset=""
-  # V1.0 附件名（含 iOS 上传前缀）
-  case "${os}-${arch}" in
-    linux-amd64) asset="prod_1a13ce8e338_76a6ae6bbc1d_nalide-cert-manager-linux-amd64" ;;
-    linux-arm64) asset="prod_1a13ce8e33c_b65cff8e1c92_nalide-cert-manager-linux-arm64" ;;
-    *) error "不支持的平台: ${os}/${arch}"; exit 1 ;;
-  esac
-  if [ "$VERSION" = "latest" ]; then
-    url="https://github.com/${REPO}/releases/latest/download/${asset}"
+# 从 GitHub API 查找匹配平台的附件下载地址（兼容文件名带前缀的情况）
+find_asset_url() {
+  local os="$1" arch="$2" tag="$3" api_url
+  if [ "$tag" = "latest" ]; then
+    api_url="https://api.github.com/repos/${REPO}/releases/latest"
   else
-    url="https://github.com/${REPO}/releases/download/${VERSION}/${asset}"
+    api_url="https://api.github.com/repos/${REPO}/releases/tags/${tag}"
+  fi
+  require_cmd curl
+  # 找名字以 nalide-cert-manager-<os>-<arch> 结尾的附件
+  curl -fsSL "$api_url" | grep -o ""browser_download_url": *"[^"]*nalide-cert-manager-${os}-${arch}[^"]*"" | head -1 | cut -d'"' -f4
+}
+
+download_binary() {
+  local os="$1" arch="$2" url=""
+  url="$(find_asset_url "$os" "$arch" "$VERSION")"
+  if [ -z "$url" ]; then
+    error "未找到 ${os}/${arch} 平台的安装包（版本: ${VERSION}）"
+    exit 1
   fi
   info "下载: ${url}"
   require_cmd curl
@@ -108,15 +115,15 @@ main() {
   cd "${tmpdir}"
   trap 'rm -rf "${tmpdir}"' EXIT
 
-  local asset=""
-  case "${os}-${arch}" in
-    linux-amd64) asset="prod_1a13ce8e338_76a6ae6bbc1d_nalide-cert-manager-linux-amd64" ;;
-    linux-arm64) asset="prod_1a13ce8e33c_b65cff8e1c92_nalide-cert-manager-linux-arm64" ;;
-  esac
   download_binary "${os}" "${arch}"
-  install_binary "${asset}"
+  install_binary "${BIN_NAME}"
 
-  info "安装完成: ${INSTALL_DIR}/${BIN_NAME}"
+  if [ -x "${INSTALL_DIR}/${BIN_NAME}" ]; then
+    info "安装完成: ${INSTALL_DIR}/${BIN_NAME}"
+  else
+    error "安装失败：二进制文件不可执行"
+    exit 1
+  fi
   echo ""
   info "启动服务: ${BIN_NAME}"
   echo "  首次启动会自动生成高强度随机密码并打印在终端，请妥善保存。"
