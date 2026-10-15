@@ -79,8 +79,23 @@ install_binary() {
 }
 
 # ---------- 主流程 ----------
+show_banner() {
+  echo -e "${GREEN}"
+  echo "  ███╗   ██╗ █████╗ ██╗     ██╗██████╗ ███████╗"
+  echo "  ████╗  ██║██╔══██╗██║     ██║██╔══██╗██╔════╝"
+  echo "  ██╔██╗ ██║███████║██║     ██║██║  ██║█████╗  "
+  echo "  ██║╚██╗██║██╔══██║██║     ██║██║  ██║██╔══╝  "
+  echo "  ██║ ╚████║██║  ██║███████╗██║██████╔╝███████╗"
+  echo "  ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝╚═════╝ ╚══════╝"
+  echo -e "${NC}"
+  echo -e "  ${GREEN}NALIDE Cert Manager${NC} - 开源 ACME 证书管理工具"
+  echo -e "  ${YELLOW}由 NALIDE 团队开发维护${NC} | https://nalide.com"
+  echo ""
+}
+
 main() {
-  info "NALIDE Cert Manager 安装程序"
+  show_banner
+  info "开始安装..."
   info "仓库: https://github.com/${REPO}"
 
   local os arch
